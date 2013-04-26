@@ -8,9 +8,9 @@ All pygments language supported are available [here](http://pygments.org/languag
 
 ## Requirements
 
-* Ruby & Gem
-* Redcarpet 2
-* Pygments.rb
+* Ruby & [Gem](http://rubygems.org/)
+* [Redcarpet 2](https://github.com/vmg/redcarpet)
+* [Pygments.rb](https://github.com/tmm1/pygments.rb)
 * Various gem
 
 ```bash
