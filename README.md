@@ -26,8 +26,9 @@ $ gem install redcarpet pygments.rb
 5. Execute
 
 ```bash
-$ cat myfile.md | ./githubMarkdown.rb > myfile.html
+$ ./githubMarkdown.rb [-t] input.md ouput.html 
 ```
+-t : Display tables content (replace ::generate_toc mark)
 
 ## Changes
 
