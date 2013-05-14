@@ -12,13 +12,13 @@ First slide Test
 
 ```php
 <?php
-		echo "prout";
+echo "test";
 echo $this->is()->sampleCode();
 phpinfo();
 class MaClasse
 {
-    public static function GoToHeel( $mavar ) {
-        return "fuck";
+    public static function GoToHell( $acdc ) {
+        return "yeah Rock'n Roll";
     }
 }
 ?>
