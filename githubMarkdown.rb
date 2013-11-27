@@ -4,15 +4,11 @@
 #  Original file from https://github.com/alampros/Docter
 #  Github-flavored markdown to HTML, in a command-line util.
 #
-#  $ cat README.md | ./github-flavored-markdown.rb
+#  More informations about Pygments lexer could be found here:
+#  http://pygments.org/docs/lexers/
 #
-#  Notes:
-#  You will need to install Pygments for syntax coloring
-#  ```bash
-#    $ sudo easy_install pygments
-#  ```
 #
-#  Install the gems `redcarpet` and `Pygments`
+#  Install the gems `redcarpet` and `Pygments.rb`
 #
 #
 require 'rubygems'
@@ -20,6 +16,7 @@ require 'redcarpet'
 require 'pathname'
 require 'pygments.rb'
 require 'optparse'
+require 'pp'
 
 $options = {}
 
@@ -43,15 +40,42 @@ class HTMLwithPygments < Redcarpet::Render::XHTML
   @@number = -1
   
   def doc_header()
-    ghf_css_path = File.join Dir.pwd, 'githubMarkdown.css'
+    #ghf_css_path = File.join Dir.pwd, 'githubMarkdown.css'
+    ghf_css_path = File.join File.dirname(__FILE__), 'githubMarkdown.css'
 	  #	puts Pygments.styles()
 			# monokai manni perldoc borland colorful default murphy vs trac tango fruity autumn bw emacs vim pastie friendly native
 			#	'<style>' + Pygments.css('.highlight',:style => 'vs') + '</style>'
-    if UNSTYLED 
-      '<div class="md"><article>'
+			
+      #if UNSTYLED 
+      style = ''
+      if $options[:presentation]
+          stylesheets = '<link rel="stylesheet" href="css/reveal.min.css">
+          <link rel="stylesheet" href="css/theme/default.css" id="theme">
+          <!-- For syntax highlighting -->
+          <link rel="stylesheet" href="lib/css/zenburn.css">'
+      elsif !UNSTYLED
+          stylesheets = '<style>' + File.read( ghf_css_path ) + '</style>'
+      end
+
+		header = '<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">' + stylesheets + '
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+    		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    </head>
+<body>
+'		
+	
+    if $options[:presentation]
+      bodyStart = '<div class="reveal"><div class="slides">'
     else
-      '<style>' + File.read(ghf_css_path) + '</style><div class="md"><article>'
+      bodyStart = '<div class="md"><article>'
     end
+    
+    header + bodyStart
 	end
 	
 	def header( text, header_level )
@@ -60,11 +84,22 @@ class HTMLwithPygments < Redcarpet::Render::XHTML
   end
   
   def doc_footer
-    '</article></div>'
+    if $options[:presentation]
+      '</div></div>'
+    else
+      '</article></div>'
+    end
   end
   
 	def block_code(code, language)
-		Pygments.highlight(code, :lexer => language, :options => {:encoding => 'utf-8'})
+	  if $options[:presentation]
+	    code = code.sub( '<?php', '' )
+	    code = code.sub( '<?', '' )
+	    code = code.sub( '?>', '' )
+	    return "<pre><code data-trim>" + code +"</code></pre>"
+	  else
+	    Pygments.highlight(code, :lexer => language, :options => {:encoding => 'utf-8', 'startinline' => 'True' })
+  	  end	
 	end
 end
 
@@ -89,7 +124,6 @@ def fromMarkdown(text)
 	if $options[:toc]
 	  render_toc  = toc.render( text )
 		full = render_html.sub( "::generate_toc", render_toc )
-		
 		return full
 	else
 	  return render_html
